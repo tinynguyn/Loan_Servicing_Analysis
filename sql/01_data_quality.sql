@@ -1,5 +1,6 @@
-#Welche Darlehen haben noch keine Auszahlung erhalten?
-#Which loans have not received any disbursement yet?
+# Active Loans Without Disbursements
+# DE: Identifiziert aktive Darlehen ohne erfasste Auszahlung, um mögliche Datenabweichungen zu erkennen.
+# EN: Identifies active loans without recorded disbursements to detect potential data inconsistencies.
 Select 
 	al.id,
     customer_id,
@@ -8,35 +9,36 @@ Select
     status
 From active_loans al 
 Left Join disbursements di On al.id = di.loan_id
-Where di.loan_id is Null
-	And al.status = 'active';
+Where di.loan_id is Null And al.status = 'active';
 
-#Welche Darlehen haben einen gesamten Auszahlungsbetrag, der den vertraglichen Darlehensbetrag überschreitet?
-#Which loans have a total disbursed amount that exceeds the contractual loan amount?
+# Excess Disbursement Detection
+# DE: Vergleicht die gesamten Auszahlungen je Darlehen mit dem vertraglichen Darlehensbetrag, um Überschreitungen zu erkennen.
+# EN: Compares total disbursements with the contractual loan amount to identify potential excess disbursements.
 Select 
 	al.id as Loan_id,
     customer_id As Customer_id,
     principal_amount,
     Sum(di.amount) As Total_Disbursed,
-    SUM(di.amount) -  al.principal_amount As Excess_Amount
+    Sum(di.amount) -  al.principal_amount As Excess_Amount
 From disbursements di
 Join active_loans al On di.loan_id = al.id
 Group by al.id 
 Having Sum(di.amount) > al.principal_amount;
 
-#Wie viele Darlehen weisen einen gesamten Auszahlungsbetrag auf, der den vertraglichen Darlehensbetrag überschreitet?
-#How many loans have a total disbursed amount that exceeds the contractual loan amount?
+#Excess Disbursement Count
+# DE: Zählt die Darlehen, deren gesamte Auszahlungen den vertraglichen Darlehensbetrag überschreiten.
+# EN: Counts loans where total disbursements exceed the contractual loan amount.
 With Excess As(
 	Select 
 		al.id as Loan_id,
 		customer_id As Customer_id,
 		principal_amount,
 		Sum(di.amount) As Total_Disbursed,
-		SUM(di.amount) -  al.principal_amount As Excess_Amount
+		Sum(di.amount) -  al.principal_amount As Excess_Amount
 	From disbursements di
 	Join active_loans al On di.loan_id = al.id
 	Group by al.id 
 	Having Sum(di.amount) > al.principal_amount)
-Select Count(*) As Total_Excess
+Select Count(*) As Excess_disbursement_loans
 From Excess;
 

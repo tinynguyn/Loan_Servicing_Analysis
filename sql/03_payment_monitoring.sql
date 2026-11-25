@@ -57,7 +57,10 @@ Select
 From vw_schedule_balance
 Where due_date < CURDATE() And unpaid_amount > 0
 Group By loan_id
-Order By overdue_installments DESC, total_unpaid_amount DESC;
+HAVING COUNT(*) > 1
+Order By 
+        overdue_installments DESC, 
+        total_unpaid_amount DESC;
 
 # Previous Month's Loan Repayments
 # DE: Berechnet die im vorherigen Kalendermonat erfassten Tilgungs- und Zinszahlungen für das monatliche Reporting.

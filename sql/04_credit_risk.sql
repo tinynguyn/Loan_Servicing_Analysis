@@ -1,22 +1,24 @@
 # Overdue Loan Monitoring
-# DE: Zeigt Darlehen mit erfassten Zahlungsrückständen und die Anzahl der Verzugstage zur Überwachung des Kreditrisikos.
-# EN: Displays loans with recorded payment delinquencies and days past due to support credit risk monitoring.
+# DE: Zeigt offene und noch nicht erledigte Zahlungsrückstände sowie die erfassten Verzugstage zur Überwachung des Kreditrisikos.
+# EN: Displays unresolved delinquency records and recorded days past due to support credit risk monitoring.
 Select
     al.id As loan_id,
     al.customer_id,
     al.status As loan_status,
+    d.status As delinquency_status,
     d.days_past_due,
     d.overdue_principal,
     d.overdue_interest,
-    d.last_checked_date
+    d.overdue_principal + d.overdue_interest As recorded_overdue_amount,
+    d.last_checked_date,    
 From delinquencies d
 Join active_loans al On d.loan_id = al.id
-Where d.days_past_due > 0
+Where d.days_past_due > 0 AND d.status IN ('open', 'in_collection', 'legal')
 Order By d.days_past_due DESC;
 
-# Delinquency Distribution
-# DE: Gruppiert Darlehen nach der maximal erfassten Anzahl an Verzugstagen, um die Verteilung der Zahlungsrückstände zu analysieren.
-# EN: Groups loans by their maximum recorded days past due to analyze the distribution of payment delinquencies.
+# Historical Delinquency Distribution
+# DE: Gruppiert Darlehen nach der maximal historisch erfassten Anzahl an Verzugstagen, einschließlich bereits erledigter Zahlungsrückstände.
+# EN: Groups loans by their maximum historically recorded days past due, including resolved cases.
 With LoanDPD As (
     Select
         loan_id,
@@ -29,7 +31,7 @@ Select
         When max_dpd Between 1 And 30 Then '1-30 days'
         When max_dpd Between 31 And 60 Then '31-60 days'
         When max_dpd Between 61 And 90 Then '61-90 days'
-        Else '90+ days'
+        Else '>90 days'
     End As dpd_category,
     Count(*) As loan_count
 From LoanDPD

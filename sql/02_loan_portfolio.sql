@@ -30,16 +30,4 @@ Join loan_products lp On lp.id = b.loan_product_id
 Group By lp.id, lp.name, b.loan_status
 Order By total_outstanding_principal DESC;
 
-# Top 10 Customers by Outstanding Principal
-# DE: Ermittelt die zehn Kunden mit der höchsten gesamten Restschuld über alle ihre Darlehen.
-# EN: Identifies the ten customers with the highest total outstanding principal across all their loans.
-Select c.id As customer_id, Concat(c.first_name, ' ', c.last_name) As customer_name,
-       Count(*) As loan_count,
-       Sum(b.outstanding_principal) As total_outstanding_principal
-From vw_loan_balance b
-Join customers c On c.id = b.customer_id
-Group By c.id, c.first_name, c.last_name
-Order By total_outstanding_principal DESC
-Limit 10;
-
 

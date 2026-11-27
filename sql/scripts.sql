@@ -72,12 +72,16 @@ Join payment_allocations pa On pa.payment_id = p.id
 Group By Date_Format(p.payment_date, '%Y-%m');
 
 # Shared View: Installment Balance
-# DE: Berechnet den offenen Betrag jeder Rate anhand des Tilgungsplans und der zugeordneten Zahlungen.
-# EN: Calculates the unpaid amount of each installment by comparing scheduled dues with allocated payments.
-Create view vw_schedule_balance As
+# DE: Berechnet den offenen Tilgungs- und Zinsbetrag jeder Rate.
+# EN: Calculates the outstanding principal and interest amount per installment.
+SELECT *
+FROM repayment_schedules
+WHERE total_due <> principal_due + interest_due;
+
+Create Or Replace View vw_schedule_balance As
 With Allocated As (
     Select schedule_id,
-           Sum(principal_paid + interest_paid + fees_paid) As allocated_due
+           Sum(principal_paid + interest_paid) As allocated_due
     From payment_allocations
     Group By schedule_id
 )

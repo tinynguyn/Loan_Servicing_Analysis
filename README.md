@@ -2,69 +2,55 @@
 
 ## Project Overview
 
-This project uses MySQL to analyze a simulated loan management database, focusing on loan portfolio analysis, payment monitoring and credit risk.
+This project uses MySQL to analyze a simulated loan management database, focusing on loan portfolio analysis, payment monitoring, data quality, and credit risk.
 
-The goal is to demonstrate how SQL can support business analysis and decision making in loan servicing operations.
+The goal is to demonstrate how SQL can support business analysis, reporting, and decision-making in loan servicing operations.
 
 ## Tools & Technologies
 
 - **Database:** MySQL 8.0
 - **Tools:** MySQL Workbench, VS Code
-- **SQL Skills:** JOIN, CTE, GROUP BY, HAVING, CASE WHEN, Aggregate Functions, Views, Date Functions
+- **SQL Skills:** JOIN, CTE, GROUP BY, HAVING, Aggregate Functions, Views, Date Functions, NULL Handling
 
 ## Dataset
 
 The project uses the [Loan Management Sample Database](https://databasesample.com/datasets/loan-management-sample-database), containing 30 related tables with simulated banking and loan management data.
-
+Of the 30 available tables, 7 relevant tables were selected based on the analytical objectives of this project
+The selected tables support loan portfolio analysis, disbursement monitoring, payment analysis, and credit risk monitoring.
 The analysis focuses on loan contracts, customers, disbursements, repayment schedules, payments, payment allocations, and delinquency records.
 
 ## Database Schema
 
 ![Database ERD](image/loan_erd.png)
 
-## Analysis
+## SQL Analysis
 
-### 1. Data Quality
+All SQL queries and reusable views are available in [scripts.sql](sql/scripts.sql), with comments in both English and German.
 
-`sql/01_data_quality.sql`
+The analysis includes:
 
-- Identify active loans without recorded disbursements.
-- Detect loans with cumulative disbursements exceeding their contractual principal.
-- Count loans flagged for potential disbursement inconsistencies.
-
-### 2. Loan Portfolio Analysis
-
-`sql/02_loan_portfolio.sql`
-
-- Calculate outstanding principal for individual loans.
-- Analyze outstanding principal by loan product and status.
-- Identify the top 10 customers by total outstanding principal.
-
-### 3. Payment Monitoring
-
-`sql/03_payment_monitoring.sql`
-
-- Analyze monthly principal, interest, fee, and penalty allocations.
-- Identify overdue installments with unpaid amounts.
-- Find loans with multiple overdue installments.
-- Calculate principal and interest collections for the previous calendar month.
-
-### 4. Credit Risk Analysis
-
-`sql/04_credit_risk.sql`
-
-- Identify loans with recorded payment delinquencies.
-- Classify loans by their maximum recorded days past due (DPD).
+- Identifying active loans without recorded disbursements.
+- Detecting loans with cumulative disbursements exceeding their contractual principal.
+- Calculating outstanding principal for individual loans.
+- Analyzing loan counts and outstanding principal by loan product and status.
+- Analyzing monthly principal, interest, fee, and penalty allocations.
+- Calculating unpaid installment balances.
+- Identifying overdue installments with unpaid amounts.
+- Identifying loans with multiple overdue installments.
+- Calculating principal and interest collections for the previous calendar month.
+- Monitoring unresolved delinquency records, recorded days past due (DPD), and overdue amounts.
 
 ## Key Findings
 
 - Identified **868 loans** where cumulative recorded disbursements exceed the contractual principal amount.
-- Developed reusable SQL views to calculate outstanding loan balances and unpaid installments.
-- Created queries to support payment monitoring, portfolio analysis, and delinquency reporting.
+- Developed two reusable SQL views to calculate outstanding principal and unpaid installment balances.
+- Created SQL queries to support data quality checks, portfolio analysis, payment monitoring, and delinquency reporting.
 
 ## Limitations
 
-The dataset contains synthetic data and some financial inconsistencies. Calculated outstanding balances and delinquency indicators should therefore be interpreted as analytical estimates rather than verified financial figures.
+The dataset contains synthetic historical data and financial inconsistencies. Calculated outstanding balances and delinquency indicators should therefore be interpreted as analytical estimates rather than verified financial figures.
+
+Date-based queries use the current system date and may require an adjusted reference date when analyzing historical data.
 
 ## Project Structure
 
@@ -75,9 +61,5 @@ loan_prj/
 ├── image/
 │   └── loan_erd.png
 └── sql/
-    ├── 01_data_quality.sql
-    ├── 02_loan_portfolio.sql
-    ├── 03_payment_monitoring.sql
-    └── 04_credit_risk.sql
+    └── scripts.sql
 ```
-

@@ -1,4 +1,4 @@
-# Active Loans Without Disbursements
+# 1.Active Loans Without Disbursements
 # DE: Identifiziert aktive Darlehen ohne erfasste Auszahlung, um mögliche Datenabweichungen zu erkennen.
 # EN: Identifies active loans without recorded disbursements to detect potential data inconsistencies.
 Select 
@@ -11,7 +11,7 @@ From active_loans al
 Left Join disbursements di On al.id = di.loan_id
 Where di.loan_id is Null And al.status = 'active';
 
-# Excess Disbursement Detection
+# 2.Excess Disbursement Detection
 # DE: Vergleicht die gesamten Auszahlungen je Darlehen mit dem vertraglichen Darlehensbetrag, um Überschreitungen zu erkennen.
 # EN: Compares total disbursements with the contractual loan amount to identify potential excess disbursements.
 Select 
@@ -25,7 +25,7 @@ Join active_loans al On di.loan_id = al.id
 Group by al.id 
 Having Sum(di.amount) > al.principal_amount;
 
-# Outstanding Principal per Loan
+# 3.Outstanding Principal per Loan
 # DE: Berechnet die verbleibende Restschuld je Darlehen, indem die erfassten Tilgungen vom ursprünglichen Darlehensbetrag abgezogen werden.
 # EN: Calculates the remaining principal balance per loan by subtracting recorded principal repayments from the original loan amount.
 Create view vw_loan_balance As
@@ -46,7 +46,7 @@ Left Join Paid pd On pd.loan_id = al.id;
 # EN: Displays the calculated outstanding principal for each loan.
 Select * From vw_loan_balance Order By loan_id;
 
-# Outstanding Principal by Product and Status
+# 4.Outstanding Principal by Product and Status
 # DE: Aggregiert die Restschuld nach Kreditprodukt und Darlehensstatus, um die Verteilung des Kreditportfolios zu analysieren.
 # EN: Aggregates outstanding principal by loan product and status to analyze the loan portfolio distribution.
 Select lp.name As loan_product, b.loan_status,
@@ -57,7 +57,7 @@ Join loan_products lp On lp.id = b.loan_product_id
 Group By lp.id, lp.name, b.loan_status
 Order By total_outstanding_principal DESC;
 
-# Monthly Payment Collections
+# 5.Monthly Payment Collections
 # DE: Berechnet die monatlich erfassten Tilgungs-, Zins-, Gebühren- und Strafzahlungsbeträge.
 # EN: Calculates monthly recorded principal, interest, fee and penalty allocations to monitor payment collections.
 Select 
@@ -71,7 +71,7 @@ From payments p
 Join payment_allocations pa On pa.payment_id = p.id
 Group By Date_Format(p.payment_date, '%Y-%m');
 
-# Shared View: Installment Balance
+# 6.Shared View: Installment Balance
 # DE: Berechnet den offenen Tilgungs- und Zinsbetrag jeder Rate.
 # EN: Calculates the outstanding principal and interest amount per installment.
 SELECT *
@@ -96,7 +96,7 @@ Select
 From repayment_schedules s
 Left Join Allocated a On a.schedule_id = s.id;
 
-# Overdue and Unpaid Installments
+# 7.Overdue and Unpaid Installments
 # DE: Identifiziert überfällige Raten mit offenen Beträgen, um ausstehende Zahlungen zu überwachen.
 # EN: Identifies overdue installments with unpaid amounts to monitor outstanding repayment obligations.
 Select 
@@ -111,7 +111,7 @@ From vw_schedule_balance
 Where due_date < CURDATE() And unpaid_amount > 0
 Order By due_date, unpaid_amount DESC;
 
-# Loans With Multiple Overdue Installments
+# 8. Loans With Multiple Overdue Installments
 # DE: Ermittelt Darlehen mit mehreren überfälligen Raten und summiert die offenen Beträge zur Unterstützung des Forderungsmanagements.
 # EN: Identifies loans with multiple overdue installments and summarizes unpaid amounts to support debt collection monitoring.
 Select
@@ -125,7 +125,7 @@ Order By
         overdue_installments DESC, 
         total_unpaid_amount DESC;
 
-# Previous Month's Loan Repayments
+# 9.Previous Month's Loan Repayments
 # DE: Berechnet die im vorherigen Kalendermonat erfassten Tilgungs- und Zinszahlungen für das monatliche Reporting.
 # EN: Calculates recorded principal and interest payments from the previous calendar month for monthly reporting.
 Select
@@ -137,7 +137,7 @@ Join payment_allocations pa On p.id = pa.payment_id
 Where p.payment_date >= Date_Format(Curdate() - Interval 1 Month, '%Y-%m-01')
 And p.payment_date < Date_Format(Curdate(), '%Y-%m-01');
 
-# Overdue Loan Monitoring
+# 10.Overdue Loan Monitoring
 # DE: Zeigt offene und noch nicht erledigte Zahlungsrückstände sowie die erfassten Verzugstage 
 # EN: Displays unresolved delinquency records and recorded days past due
 Select
